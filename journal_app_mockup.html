@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JRNL - Minimal Digital Journal</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Tailwind Configuration & Custom Styles -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        accent: 'var(--color-accent)',
+                        'accent-soft': 'var(--color-accent-soft)',
+                        'accent-light': 'var(--color-accent-light)',
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'soft-hover': '0 10px 30px -4px rgba(0, 0, 0, 0.08)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Base Theme - Graphite (Greys/Blacks) */
+        :root {
+            --color-accent: #27272a;       /* Zinc 800 */
+            --color-accent-soft: #e4e4e7;  /* Zinc 200 */
+            --color-accent-light: #f4f4f5; /* Zinc 100 */
+        }
+
+        /* Theme Variations */
+        [data-theme="sage"] {
+            --color-accent: #5f6c5a;
+            --color-accent-soft: #e5e8e4;
+            --color-accent-light: #f3f4f2;
+        }
+        
+        [data-theme="slate"] {
+            --color-accent: #5c6b7d;
+            --color-accent-soft: #e2e6eb;
+            --color-accent-light: #f1f4f6;
+        }
+
+        [data-theme="rose"] {
+            --color-accent: #9b7a7f;
+            --color-accent-soft: #efe8e9;
+            --color-accent-light: #f8f5f6;
+        }
+
+        body {
+            background-color: #fafafa;
+            color: #171717;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Smooth transitions for theme switching */
+        .theme-transition {
+            transition: all 0.3s ease;
+        }
+
+        /* Custom Scrollbar for Masonry layout if needed */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--color-accent-soft);
+            border-radius: 4px;
+        }
+        
+        /* Hide scrollbar for layout toggles */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="h-screen w-full flex overflow-hidden font-sans">
+
+    <!-- Sidebar -->
+    <aside class="w-20 md:w-64 border-r border-gray-200 bg-white flex flex-col justify-between transition-all duration-300 z-10 shrink-0">
+        
+        <!-- Top Section -->
+        <div>
+            <div class="h-20 flex items-center justify-center md:justify-start md:px-8 border-b border-gray-100">
+                <i data-lucide="book-open" class="text-accent theme-transition w-6 h-6"></i>
+                <span class="hidden md:block ml-3 font-semibold tracking-widest text-sm text-accent theme-transition uppercase">JRNL</span>
+            </div>
+            
+            <nav class="mt-8 px-4 space-y-2">
+                <a href="#" class="flex items-center px-4 py-3 bg-accent-light text-accent rounded-xl theme-transition group">
+                    <i data-lucide="grid" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+                    <span class="hidden md:block ml-4 font-medium text-sm">All Journals</span>
+                </a>
+                <a href="#" class="flex items-center px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-all group">
+                    <i data-lucide="bookmark" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+                    <span class="hidden md:block ml-4 font-medium text-sm">Favorites</span>
+                </a>
+                <a href="#" class="flex items-center px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-all group">
+                    <i data-lucide="hash" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+                    <span class="hidden md:block ml-4 font-medium text-sm">Tags</span>
+                </a>
+                <a href="#" class="flex items-center px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-all group">
+                    <i data-lucide="archive" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+                    <span class="hidden md:block ml-4 font-medium text-sm">Archive</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Bottom Section: Theme Picker & Settings -->
+        <div class="p-4 mb-4">
+            <div class="hidden md:block px-4 mb-4">
+                <p class="text-xs font-medium text-gray-400 mb-3 uppercase tracking-wider">UI Color</p>
+                <div class="flex space-x-2">
+                    <button onclick="setTheme('graphite')" class="w-6 h-6 rounded-full bg-zinc-800 ring-2 ring-offset-2 ring-transparent hover:ring-zinc-800 transition-all focus:outline-none" aria-label="Graphite"></button>
+                    <button onclick="setTheme('sage')" class="w-6 h-6 rounded-full bg-[#5f6c5a] ring-2 ring-offset-2 ring-transparent hover:ring-[#5f6c5a] transition-all focus:outline-none" aria-label="Sage"></button>
+                    <button onclick="setTheme('slate')" class="w-6 h-6 rounded-full bg-[#5c6b7d] ring-2 ring-offset-2 ring-transparent hover:ring-[#5c6b7d] transition-all focus:outline-none" aria-label="Slate"></button>
+                    <button onclick="setTheme('rose')" class="w-6 h-6 rounded-full bg-[#9b7a7f] ring-2 ring-offset-2 ring-transparent hover:ring-[#9b7a7f] transition-all focus:outline-none" aria-label="Rose"></button>
+                </div>
+            </div>
+            <a href="#" class="flex items-center px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-all">
+                <i data-lucide="settings" class="w-5 h-5"></i>
+                <span class="hidden md:block ml-4 font-medium text-sm">Settings</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-full bg-[#fafafa]">
+        
+        <!-- Header -->
+        <header class="h-20 px-8 flex items-center justify-between border-b border-gray-100 bg-white/50 backdrop-blur-sm shrink-0">
+            <div>
+                <h1 class="text-xl font-semibold text-gray-900">Good morning, Alex.</h1>
+                <p class="text-sm text-gray-500 mt-0.5">You have 5 active journals.</p>
+            </div>
+
+            <div class="flex items-center space-x-6">
+                <!-- Layout Toggles (The 3 Versions) -->
+                <div class="hidden sm:flex bg-gray-100 p-1 rounded-lg">
+                    <button onclick="setLayout('grid')" id="btn-grid" class="p-2 rounded-md bg-white shadow-sm text-accent transition-all" title="Version 1: Classic Grid">
+                        <i data-lucide="layout-grid" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="setLayout('masonry')" id="btn-masonry" class="p-2 rounded-md text-gray-400 hover:text-gray-700 transition-all" title="Version 2: Masonry">
+                        <i data-lucide="columns" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="setLayout('list')" id="btn-list" class="p-2 rounded-md text-gray-400 hover:text-gray-700 transition-all" title="Version 3: Minimal List">
+                        <i data-lucide="list" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <div class="w-px h-6 bg-gray-200 hidden sm:block"></div>
+                
+                <button class="w-10 h-10 rounded-full bg-accent-light text-accent flex items-center justify-center theme-transition hover:scale-105">
+                    <i data-lucide="search" class="w-5 h-5"></i>
+                </button>
+                
+                <div class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden cursor-pointer border-2 border-white shadow-sm">
+                    <img src="https://api.dicebear.com/7.x/notionists/svg?seed=Alex&backgroundColor=f4f4f5" alt="Avatar" class="w-full h-full object-cover">
+                </div>
+            </div>
+        </header>
+
+        <!-- Dynamic Content Area -->
+        <div class="flex-1 overflow-y-auto p-8 relative" id="main-scroll-area">
+            
+            <div class="max-w-7xl mx-auto w-full">
+                
+                <!-- Section Header -->
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-lg font-medium text-gray-800" id="layout-title">Classic Grid View</h2>
+                    <button class="flex items-center space-x-2 text-sm font-medium text-white bg-accent px-4 py-2 rounded-lg hover:opacity-90 transition-opacity theme-transition shadow-sm">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        <span>New Journal</span>
+                    </button>
+                </div>
+
+                <!-- Journals Container (Layout changes applied here) -->
+                <div id="journals-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <!-- Javascript will populate this -->
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- Data ---
+        const journals = [
+            { id: 1, title: 'Daily Reflections', entries: 142, lastModified: '2 hours ago', icon: 'pen-tool', pattern: 'diagonal-stripes', height: 'normal' },
+            { id: 2, title: 'Travel Log: Japan', entries: 24, lastModified: 'Yesterday', icon: 'map', pattern: 'dots', height: 'tall' },
+            { id: 3, title: 'Project Ideas', entries: 89, lastModified: '3 days ago', icon: 'lightbulb', pattern: 'solid', height: 'short' },
+            { id: 4, title: 'Reading Notes', entries: 12, lastModified: '1 week ago', icon: 'book', pattern: 'waves', height: 'tall' },
+            { id: 5, title: 'Dream Journal', entries: 45, lastModified: '2 weeks ago', icon: 'moon', pattern: 'solid', height: 'normal' },
+        ];
+
+        // --- State ---
+        let currentLayout = 'grid'; // grid, masonry, list
+
+        // --- DOM Elements ---
+        const container = document.getElementById('journals-container');
+        const layoutTitle = document.getElementById('layout-title');
+        
+        // Buttons
+        const btnGrid = document.getElementById('btn-grid');
+        const btnMasonry = document.getElementById('btn-masonry');
+        const btnList = document.getElementById('btn-list');
+
+        // --- Functions ---
+
+        // 1. Theme Switcher
+        function setTheme(themeName) {
+            document.documentElement.setAttribute('data-theme', themeName);
+            // Re-render to ensure inline styles or accent-dependent things update if needed
+            renderJournals(); 
+        }
+
+        // 2. Layout Switcher
+        function setLayout(layoutType) {
+            currentLayout = layoutType;
+            
+            // Update button styles
+            const buttons = [btnGrid, btnMasonry, btnList];
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-white', 'shadow-sm', 'text-accent');
+                btn.classList.add('text-gray-400', 'hover:text-gray-700');
+            });
+
+            const activeBtn = document.getElementById(`btn-${layoutType}`);
+            activeBtn.classList.remove('text-gray-400', 'hover:text-gray-700');
+            activeBtn.classList.add('bg-white', 'shadow-sm', 'text-accent');
+
+            // Update Container Classes & Title
+            container.className = ''; // Reset
+            
+            if (layoutType === 'grid') {
+                layoutTitle.innerText = 'Version 1: Classic Grid';
+                container.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6';
+            } else if (layoutType === 'masonry') {
+                layoutTitle.innerText = 'Version 2: Masonry Cards';
+                container.className = 'columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6';
+            } else if (layoutType === 'list') {
+                layoutTitle.innerText = 'Version 3: Minimal List';
+                container.className = 'flex flex-col gap-3 max-w-4xl mx-auto';
+            }
+
+            renderJournals();
+        }
+
+        // 3. Render Content Based on Layout
+        function renderJournals() {
+            container.innerHTML = '';
+
+            journals.forEach(journal => {
+                const el = document.createElement('div');
+                
+                if (currentLayout === 'grid') {
+                    // VERSION 1: GRID VIEW (Uniform cards, standard height)
+                    el.className = 'group bg-white rounded-2xl border border-gray-100 shadow-soft hover:shadow-soft-hover transition-all duration-300 cursor-pointer overflow-hidden flex flex-col h-72';
+                    el.innerHTML = `
+                        <!-- Cover Thumbnail -->
+                        <div class="h-3/5 w-full bg-accent-light theme-transition relative overflow-hidden flex items-center justify-center p-4">
+                            <div class="absolute left-0 top-0 bottom-0 w-4 bg-accent opacity-10 mix-blend-multiply"></div>
+                            <div class="w-16 h-16 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                <i data-lucide="${journal.icon}" class="w-6 h-6 text-accent theme-transition"></i>
+                            </div>
+                        </div>
+                        <!-- Meta info -->
+                        <div class="p-5 flex-1 flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-semibold text-gray-900 mb-1">${journal.title}</h3>
+                                <p class="text-xs text-gray-500">${journal.entries} entries</p>
+                            </div>
+                            <div class="flex items-center justify-between mt-4">
+                                <span class="text-xs text-gray-400">${journal.lastModified}</span>
+                                <button class="opacity-0 group-hover:opacity-100 transition-opacity text-accent hover:bg-accent-soft p-1.5 rounded-md">
+                                    <i data-lucide="more-horizontal" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+
+                } else if (currentLayout === 'masonry') {
+                    // VERSION 2: MASONRY VIEW (Varying heights, more organic look)
+                    const heightClass = journal.height === 'tall' ? 'h-96' : (journal.height === 'short' ? 'h-56' : 'h-72');
+                    
+                    el.className = `group bg-white rounded-3xl border border-gray-100 shadow-soft hover:shadow-soft-hover transition-all duration-300 cursor-pointer overflow-hidden relative break-inside-avoid ${heightClass}`;
+                    el.innerHTML = `
+                        <!-- Full Cover Background -->
+                        <div class="absolute inset-0 bg-accent-light theme-transition opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                        
+                        <!-- Content -->
+                        <div class="relative h-full p-6 flex flex-col justify-between z-10">
+                            <div class="w-12 h-12 rounded-xl bg-white/80 backdrop-blur-sm shadow-sm flex items-center justify-center mb-4">
+                                <i data-lucide="${journal.icon}" class="w-5 h-5 text-accent theme-transition"></i>
+                            </div>
+                            
+                            <div class="bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-sm border border-white/20 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                                <h3 class="font-semibold text-gray-900 mb-1">${journal.title}</h3>
+                                <div class="flex items-center justify-between">
+                                    <p class="text-xs text-gray-500">${journal.entries} entries</p>
+                                    <span class="text-[10px] uppercase tracking-wider text-accent font-medium">${journal.lastModified}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                } else if (currentLayout === 'list') {
+                    // VERSION 3: LIST VIEW (Compact rows, good for bulk organization)
+                    el.className = 'group bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer flex items-center p-3 pr-5';
+                    el.innerHTML = `
+                        <!-- Tiny Thumbnail -->
+                        <div class="w-16 h-16 rounded-lg bg-accent-light theme-transition flex items-center justify-center shrink-0">
+                            <i data-lucide="${journal.icon}" class="w-5 h-5 text-accent theme-transition"></i>
+                        </div>
+                        
+                        <!-- Info -->
+                        <div class="ml-4 flex-1 flex flex-col sm:flex-row sm:items-center justify-between">
+                            <div>
+                                <h3 class="font-medium text-gray-900">${journal.title}</h3>
+                                <p class="text-xs text-gray-500 mt-0.5 sm:hidden">${journal.entries} entries</p>
+                            </div>
+                            
+                            <div class="hidden sm:flex items-center space-x-12 text-sm text-gray-500">
+                                <span class="w-20 text-right">${journal.entries} entries</span>
+                                <span class="w-24 text-right">${journal.lastModified}</span>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="ml-4 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                             <button class="text-gray-400 hover:text-accent p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                                <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    `;
+                }
+
+                container.appendChild(el);
+            });
+            
+            // Re-initialize Lucide icons for newly created elements
+            lucide.createIcons();
+        }
+
+        // Initialize App
+        lucide.createIcons();
+        renderJournals(); // Initial render with 'grid' layout
+
+    </script>
+</body>
+</html>

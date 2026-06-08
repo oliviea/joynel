@@ -1,0 +1,30 @@
+name: joynel
+description: "A new Flutter project."
+publish_to: "none"
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.12.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  path_provider: ^2.0.14
+  file_picker: ^5.2.6
+  image_picker: ^0.8.7+5
+  flutter_staggered_grid_view: ^0.7.0
+  pdf: ^3.11.0
+  pencil_kit: 2.1.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  # hive_generator and build_runner omitted (manual adapter used)
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
