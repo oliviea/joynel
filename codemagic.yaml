@@ -1,0 +1,23 @@
+workflows:
+  flutter-ios:
+    name: Flutter iOS build
+    environment:
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Install dependencies
+        script: |
+          flutter pub get
+      - name: Analyze
+        script: |
+          flutter analyze
+      - name: Run tests
+        script: |
+          flutter test
+      - name: Build iOS App
+        script: |
+          flutter build ios --release --no-codesign
+    artifacts:
+      - build/ios/iphoneos/Runner.app
+      - build/ios/ipa/*.ipa
